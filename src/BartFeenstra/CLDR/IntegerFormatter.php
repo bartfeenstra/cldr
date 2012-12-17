@@ -315,13 +315,13 @@ class IntegerFormatter {
    *   Characters that should be matched by a NumberPatternSymbol object.
    */
   function replacePlaceholders(array $symbols, array $placeholders = array()) {
-    $placeholders += array(
+    $placeholders = array_merge(array(
       self::SYMBOL_SPECIAL_GROUPING_SEPARATOR,
       self::SYMBOL_SPECIAL_INFINITY,
       self::SYMBOL_SPECIAL_MINUS,
       self::SYMBOL_SPECIAL_NAN,
       self::SYMBOL_SPECIAL_PLUS,
-    );
+    ), $placeholders);
     $replacements = array();
     foreach (array_unique($placeholders) as $placeholder) {
       $replacements[$placeholder] = $this->getReplacement($placeholder);
