@@ -33,7 +33,7 @@ class CurrencyFormatter extends DecimalFormatter {
    * @param string $currency_sign
    *   An ISO 4217 code or currency sign.
    */
-  public function format($number, $currency_sign) {
+  public function format($number, $currency_sign = NULL) {
     $this->symbol_replacements[self::SYMBOL_SPECIAL_CURRENCY] = $currency_sign;
 
     return parent::format($number);

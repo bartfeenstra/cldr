@@ -86,7 +86,8 @@ class DecimalFormatter extends IntegerFormatter {
     $this->process($symbols[$sign][self::MAJOR], $digits[self::MAJOR]);
     // Integer formatting defaults from right to left, but minor units should
     // be formatted from left to right, so reverse all data and results.
-    $this->process(array_reverse($symbols[$sign][self::MINOR]), array_reverse($digits[self::MINOR]));
+    $symbols_minor = array_reverse($symbols[$sign][self::MINOR]);
+    $this->process($symbols_minor, array_reverse($digits[self::MINOR]));
     foreach ($symbols[$sign][self::MINOR] as $symbol) {
       if (!is_null($symbol->replacement)) {
         $symbol->replacement = strrev($symbol->replacement);
