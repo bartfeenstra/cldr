@@ -184,7 +184,7 @@ class IntegerFormatter {
       }
     }
 
-    // Find illegal escape symbols, e.g. escape symbols that do not escape
+    // Find illegal escape symbols, such as escape symbols that do not escape
     // other symbols and are not escaped themselves.
     foreach ($symbols as $symbol) {
       if ($symbol->symbol == self::SYMBOL_ESCAPE && !$symbol->escaped && !$symbol->escapes_other_symbol) {

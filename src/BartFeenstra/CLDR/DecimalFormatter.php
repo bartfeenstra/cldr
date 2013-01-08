@@ -78,7 +78,7 @@ class DecimalFormatter extends IntegerFormatter {
     );
 
     $digits = array(
-      str_split($number[self::MAJOR]),      
+      str_split($number[self::MAJOR]),
       strlen($number[self::MINOR]) ? str_split($number[self::MINOR]) : array(),
     );
 
