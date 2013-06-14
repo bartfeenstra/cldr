@@ -37,6 +37,9 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase {
     // Test validating valid number patterns.
     $patterns_valid = array(
       'foo.00;bar.00',
+      // No decimal separator.
+      'foo',
+      'foo:bar',
     );
     foreach ($patterns_valid as $pattern) {
       try {
@@ -53,9 +56,6 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase {
     $patterns_invalid = array(
       // An empty pattern.
       '',
-      // No decimal separator.
-      'foo',
-      'foo:bar',
       // Empty negative pattern.
       'foo.00;',
       // Empty positive pattern.

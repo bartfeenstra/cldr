@@ -50,10 +50,14 @@ class DecimalFormatter extends IntegerFormatter {
         throw new \InvalidArgumentException('Empty number pattern.');
       }
     }
-    $this->symbols = array(
-      $this->patternSymbolsSplit($symbols[self::POSITIVE], self::SYMBOL_SPECIAL_DECIMAL_SEPARATOR),
-      $this->patternSymbolsSplit($symbols[self::NEGATIVE], self::SYMBOL_SPECIAL_DECIMAL_SEPARATOR),
-    );
+    foreach (array(self::POSITIVE, self::NEGATIVE) as $sign) {
+      try {
+        $this->symbols[$sign] = $this->patternSymbolsSplit($symbols[$sign], self::SYMBOL_SPECIAL_DECIMAL_SEPARATOR);
+      }
+      catch(\RuntimeException $e) {
+        $this->symbols[$sign] = array();
+      }
+    }
   }
 
   /**
