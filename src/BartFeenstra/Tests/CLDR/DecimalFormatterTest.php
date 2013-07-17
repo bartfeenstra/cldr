@@ -40,6 +40,8 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase {
   public function validPattern() {
     return array(
       array('foo.00;bar.00'),
+      // No decimal separator.
+      array('fo0'),
     );
   }
 
@@ -55,8 +57,6 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase {
     return array(
       // An empty pattern.
       array(''),
-      // No decimal separator.
-      array('foo'),
       array('foo:bar'),
       // Empty negative pattern.
       array('foo.00;'),

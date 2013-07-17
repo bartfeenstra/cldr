@@ -46,13 +46,19 @@ class DecimalFormatter extends IntegerFormatter {
       $symbols = $this->patternSymbolsSplit($this->patternSymbols($pattern), self::SYMBOL_PATTERN_SEPARATOR, TRUE);
     }
     foreach ($symbols as $sign_symbols) {
+      // All formats should have one 0 before the decimal point (for example, avoid #,###.##)
+      $sign_symbols = array_filter($sign_symbols, function($symbol) {
+        return in_array($symbol->symbol, array(
+          self::SYMBOL_DIGIT
+        ));
+      });
       if (empty($sign_symbols)) {
         throw new \InvalidArgumentException('Empty number pattern.');
       }
     }
     $this->symbols = array(
-      $this->patternSymbolsSplit($symbols[self::POSITIVE], self::SYMBOL_SPECIAL_DECIMAL_SEPARATOR),
-      $this->patternSymbolsSplit($symbols[self::NEGATIVE], self::SYMBOL_SPECIAL_DECIMAL_SEPARATOR),
+      $this->patternSymbolsSplit($symbols[self::POSITIVE], self::SYMBOL_SPECIAL_DECIMAL_SEPARATOR, TRUE),
+      $this->patternSymbolsSplit($symbols[self::NEGATIVE], self::SYMBOL_SPECIAL_DECIMAL_SEPARATOR, TRUE),
     );
   }
 
