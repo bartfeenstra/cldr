@@ -12,6 +12,17 @@ namespace BartFeenstra\CLDR;
  */
 class CurrencyFormatter extends DecimalFormatter {
 
+  function __construct($pattern, array $symbol_replacements = array()) {
+    parent::__construct($pattern, $symbol_replacements);
+    foreach ($this->symbols as $sign_symbols) {
+      $fraction_symbols = $sign_symbols[1];
+      if (count($fraction_symbols) != 2 || $fraction_symbols[0]->symbol != self::SYMBOL_DIGIT || $fraction_symbols[1]->symbol != self::SYMBOL_DIGIT) {
+        throw new \InvalidArgumentException('Currency formats should have two zeros in the fractional position.');
+      }
+    };
+  }
+
+
   /**
    * The currency's symbol.
    *

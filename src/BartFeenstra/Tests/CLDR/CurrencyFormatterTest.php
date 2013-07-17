@@ -27,4 +27,22 @@ class CurrencyFormatterTest extends \PHPUnit_Framework_TestCase {
     $result = $formatter->format($number, $currency_sign);
     $this->assertSame($result, $result_expected, 'BartFeenstra\CLDR\CurrencyFormatter::format() formats amount ' . $number . ' as ' . $result_expected . ' using pattern ' . $formatter->pattern . ' (result was ' . $result . ').');
   }
+
+  /**
+   * @dataProvider pattern
+   */
+  function testPatternValidation($pattern, $exceptionName = NULL, $exceptionMessage = '', $exceptionCode = NULL) {
+    if (!empty($exceptionName)) {
+      $this->setExpectedException($exceptionName, $exceptionMessage, $exceptionCode);
+    }
+    new CurrencyFormatter($pattern);
+  }
+
+  function pattern() {
+    return array(
+      array('¤0.00'),
+      array('0.00'),
+      array('¤ #,##0.##', 'InvalidArgumentException', 'Currency formats should have two zeros in the fractional position.'),
+    );
+  }
 }
