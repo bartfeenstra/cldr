@@ -33,6 +33,8 @@ class DecimalFormatter extends IntegerFormatter {
    */
   const SYMBOL_SPECIAL_DECIMAL_SEPARATOR = '.';
 
+  private $defaultParameters;
+
   /**
    * Overrides parent::__construct().
    */
@@ -60,6 +62,7 @@ class DecimalFormatter extends IntegerFormatter {
       $this->patternSymbolsSplit($symbols[self::POSITIVE], self::SYMBOL_SPECIAL_DECIMAL_SEPARATOR, TRUE),
       $this->patternSymbolsSplit($symbols[self::NEGATIVE], self::SYMBOL_SPECIAL_DECIMAL_SEPARATOR, TRUE),
     );
+    $this->defaultParameters = new DecimalFormatterParameters(array());
   }
 
   /**
@@ -70,10 +73,14 @@ class DecimalFormatter extends IntegerFormatter {
    *
    * @param float|string $number
    */
-  public function format($number) {
+  public function format($number, DecimalFormatterParameters $parameters = NULL) {
     if ((float) $number != $number) {
       throw new \InvalidArgumentException('Number has no valid float value.');
     }
+    if ($parameters == NULL) {
+      $parameters = $this->defaultParameters;
+    }
+
     $sign = (int) ($number < 0);
 
     // Split the number in major and minor units, and make sure there is a
@@ -82,6 +89,19 @@ class DecimalFormatter extends IntegerFormatter {
     $number += array(
       self::MINOR => '',
     );
+
+    if ($parameters->maximumIntegerDigits() && strlen($number[self::MAJOR]) > $parameters->maximumIntegerDigits()) {
+      $number[self::MAJOR] = substr($number[self::MAJOR], -$parameters->maximumIntegerDigits());
+    }
+    if ($parameters->maximumFractionDigits() && strlen($number[self::MINOR]) > $parameters->maximumFractionDigits()) {
+      $number[self::MINOR] = round(substr_replace($number[self::MINOR], '.', $parameters->maximumFractionDigits(), 0));
+    }
+    if ($parameters->minimumIntegerDigits()) {
+      $number[self::MAJOR] = str_pad($number[self::MAJOR], $parameters->minimumIntegerDigits(), 0, STR_PAD_LEFT);
+    }
+    if ($parameters->minimumFractionDigits()) {
+      $number[self::MINOR] = str_pad($number[self::MINOR], $parameters->minimumFractionDigits(), 0, STR_PAD_RIGHT);
+    }
 
     $digits = array(
       str_split($number[self::MAJOR]),
@@ -107,12 +127,29 @@ class DecimalFormatter extends IntegerFormatter {
     );
     foreach ($symbols[$sign] as $fragment => $fragment_symbols) {
       $this->replacePlaceholders($fragment_symbols);
+      $fractionDigits = 0;
       foreach ($fragment_symbols as $symbol) {
-        $output[$fragment] .= !is_null($symbol->replacement) ? $symbol->replacement : $symbol->symbol;
+        $keep_symbol = TRUE;
+        if ($fragment == self::MINOR && $parameters->maximumFractionDigits() && $symbol->symbol == self::SYMBOL_DIGIT) {
+          $fractionDigits++;
+          if ($fractionDigits > $parameters->minimumFractionDigits()) {
+            $keep_symbol = FALSE;
+          }
+        }
+        $output[$fragment] .= !is_null($symbol->replacement) ? $symbol->replacement : ($keep_symbol ? $symbol->symbol : '');
       }
     }
-
-    return $output[self::MAJOR] . $this->getReplacement(self::SYMBOL_SPECIAL_DECIMAL_SEPARATOR) . $output[self::MINOR];
+    if ($output[self::MINOR] == '') {
+      if  (strpos($this->pattern, self::SYMBOL_SPECIAL_DECIMAL_SEPARATOR) !== FALSE && $parameters->minimumFractionDigits() !== 0) {
+        return $output[self::MAJOR] . $this->getReplacement(self::SYMBOL_SPECIAL_DECIMAL_SEPARATOR);
+      }
+      else {
+        return $output[self::MAJOR];
+      }
+    }
+    else {
+      return $output[self::MAJOR] . $this->getReplacement(self::SYMBOL_SPECIAL_DECIMAL_SEPARATOR) . $output[self::MINOR];
+    }
   }
 
   /**

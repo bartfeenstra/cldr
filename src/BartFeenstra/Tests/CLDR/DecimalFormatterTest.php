@@ -8,6 +8,7 @@
 namespace BartFeenstra\Tests\CLDR;
 
 use BartFeenstra\CLDR\DecimalFormatter;
+use BartFeenstra\CLDR\DecimalFormatterParameters;
 
 require_once __DIR__ . '/../../../../vendor/autoload.php';
 
@@ -73,11 +74,11 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase {
    * @depends testValidPatternValidation
    * @depends testInvalidPatternValidation
    */
-  function testFormat($numbers, $formatter, $results_expected) {
+  function testFormat($numbers, $formatter, $results_expected, $formatter_parameters = NULL) {
     foreach ($numbers as $i => $number) {
       $result_expected = $results_expected[$i];
-      $result = $formatter->format($number);
-      $this->assertSame($result, $result_expected, 'BartFeenstra\CLDR\DecimalFormatter::format() formats amount ' . $number . ' as ' . $result_expected . ' using pattern ' . $formatter->pattern . ' (result was ' . $result . ').');
+      $result = $formatter->format($number, $formatter_parameters);
+      $this->assertSame($result_expected, $result, 'BartFeenstra\CLDR\DecimalFormatter::format() formats amount ' . $number . ' as ' . $result_expected . ' using pattern ' . $formatter->pattern . ' (result was ' . $result . ').');
     }
   }
 
@@ -155,6 +156,23 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase {
           '1234567#,89',
           '-123456#,789',
         ),
+      ),
+      // Test parameters.
+      array(
+        array(3333.3333, 3),
+        'formatter' => new DecimalFormatter("#,##0.00", array(
+          DecimalFormatter::SYMBOL_SPECIAL_DECIMAL_SEPARATOR => ',',
+          DecimalFormatter::SYMBOL_SPECIAL_GROUPING_SEPARATOR => '.',
+        )),
+        'results' => array(
+          '333,33', '03,0'
+        ),
+        new DecimalFormatterParameters(array(
+          'minimumFractionDigits' => 1,
+          'maximumFractionDigits' => 2,
+          'maximumIntegerDigits' => 3,
+          'minimumIntegerDigits' => 2
+        )),
       ),
     );
   }
