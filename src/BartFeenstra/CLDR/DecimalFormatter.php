@@ -90,16 +90,16 @@ class DecimalFormatter extends IntegerFormatter {
       self::MINOR => '',
     );
 
-    if ($parameters->maximumIntegerDigits() && strlen($number[self::MAJOR]) > $parameters->maximumIntegerDigits()) {
+    if (!is_null($parameters->maximumIntegerDigits()) && strlen($number[self::MAJOR]) > $parameters->maximumIntegerDigits()) {
       $number[self::MAJOR] = substr($number[self::MAJOR], -$parameters->maximumIntegerDigits());
     }
-    if ($parameters->maximumFractionDigits() && strlen($number[self::MINOR]) > $parameters->maximumFractionDigits()) {
+    if (!is_null($parameters->maximumFractionDigits()) && strlen($number[self::MINOR]) > $parameters->maximumFractionDigits()) {
       $number[self::MINOR] = round(substr_replace($number[self::MINOR], '.', $parameters->maximumFractionDigits(), 0));
     }
-    if ($parameters->minimumIntegerDigits()) {
+    if (!is_null($parameters->minimumIntegerDigits())) {
       $number[self::MAJOR] = str_pad($number[self::MAJOR], $parameters->minimumIntegerDigits(), 0, STR_PAD_LEFT);
     }
-    if ($parameters->minimumFractionDigits()) {
+    if (!is_null($parameters->minimumFractionDigits())) {
       $number[self::MINOR] = str_pad($number[self::MINOR], $parameters->minimumFractionDigits(), 0, STR_PAD_RIGHT);
     }
 
@@ -130,7 +130,7 @@ class DecimalFormatter extends IntegerFormatter {
       $fractionDigits = 0;
       foreach ($fragment_symbols as $symbol) {
         $keep_symbol = TRUE;
-        if ($fragment == self::MINOR && $parameters->maximumFractionDigits() && $symbol->symbol == self::SYMBOL_DIGIT) {
+        if ($fragment == self::MINOR && !is_null($parameters->maximumFractionDigits()) && $symbol->symbol == self::SYMBOL_DIGIT) {
           $fractionDigits++;
           if ($fractionDigits > $parameters->minimumFractionDigits()) {
             $keep_symbol = FALSE;

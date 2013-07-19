@@ -25,10 +25,10 @@ class DecimalFormatterParameters {
    *   methods available in this class.
    */
   public function __construct(array $parameters) {
-    $this->maximumIntegerDigits = !empty($parameters['maximumIntegerDigits']) ? (integer) $parameters['maximumIntegerDigits'] : NULL;
-    $this->minimumIntegerDigits = !empty($parameters['minimumIntegerDigits']) ? (integer) $parameters['minimumIntegerDigits'] : NULL;
-    $this->maximumFractionDigits = !empty($parameters['maximumFractionDigits']) ? (integer) $parameters['maximumFractionDigits'] : NULL;
-    $this->minimumFractionDigits = !empty($parameters['minimumFractionDigits']) ? (integer) $parameters['minimumFractionDigits'] : NULL;
+    $this->maximumIntegerDigits = isset($parameters['maximumIntegerDigits']) ? (integer) $parameters['maximumIntegerDigits'] : NULL;
+    $this->minimumIntegerDigits = isset($parameters['minimumIntegerDigits']) ? (integer) $parameters['minimumIntegerDigits'] : NULL;
+    $this->maximumFractionDigits = isset($parameters['maximumFractionDigits']) ? (integer) $parameters['maximumFractionDigits'] : NULL;
+    $this->minimumFractionDigits = isset($parameters['minimumFractionDigits']) ? (integer) $parameters['minimumFractionDigits'] : NULL;
   }
 
   /**

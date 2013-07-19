@@ -174,6 +174,22 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase {
           'minimumIntegerDigits' => 2
         )),
       ),
+      array(
+        array(222, 2),
+        'formatter' => new DecimalFormatter("#,##0.00", array(
+          DecimalFormatter::SYMBOL_SPECIAL_DECIMAL_SEPARATOR => ',',
+          DecimalFormatter::SYMBOL_SPECIAL_GROUPING_SEPARATOR => '.',
+        )),
+        'results' => array(
+          '222', '02'
+        ),
+        new DecimalFormatterParameters(array(
+          'minimumFractionDigits' => 0,
+          'maximumFractionDigits' => 2,
+          'maximumIntegerDigits' => 3,
+          'minimumIntegerDigits' => 2
+        )),
+      ),
     );
   }
 }
