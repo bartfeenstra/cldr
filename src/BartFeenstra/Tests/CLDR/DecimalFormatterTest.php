@@ -8,6 +8,7 @@
 namespace BartFeenstra\Tests\CLDR;
 
 use BartFeenstra\CLDR\DecimalFormatter;
+use BartFeenstra\CLDR\DecimalFormatterParameters;
 
 require_once __DIR__ . '/../../../../vendor/autoload.php';
 
@@ -31,63 +32,66 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
-   * Tests number pattern validation.
+   * @dataProvider validPattern
    */
-  function testPatternValidation() {
-    // Test validating valid number patterns.
-    $patterns_valid = array(
-      'foo.00;bar.00',
-    );
-    foreach ($patterns_valid as $pattern) {
-      try {
-        new DecimalFormatter($pattern);
-        $valid = TRUE;
-      }
-      catch (\Exception $e) {
-        $valid = FALSE;
-      }
-      $this->assertTrue($valid, 'BartFeenstra\CLDR\DecimalFormatter::__construct() does not throw an exception for valid pattern ' . $pattern . '.');
-    }
+  function testValidPatternValidation($pattern) {
+    new DecimalFormatter($pattern);
+  }
 
-    // Test validating invalid number patterns.
-    $patterns_invalid = array(
-      // An empty pattern.
-      '',
+  public function validPattern() {
+    return array(
+      array('foo.00;bar.00'),
       // No decimal separator.
-      'foo',
-      'foo:bar',
-      // Empty negative pattern.
-      'foo.00;',
-      // Empty positive pattern.
-      ';bar.00',
+      array('fo0'),
     );
-    foreach ($patterns_invalid as $pattern) {
-      try {
-        new DecimalFormatter($pattern);
-        $valid = TRUE;
-      }
-      catch (\Exception $e) {
-        $valid = FALSE;
-      }
-      $this->assertFalse($valid, 'BartFeenstra\CLDR\DecimalFormatter::__construct() throws an exception for invalid pattern ' . $pattern . '.');
-    }
+  }
+
+  /**
+   * @dataProvider invalidPattern
+   * @expectedException \Exception
+   */
+  function testInvalidPatternValidation($pattern) {
+    new DecimalFormatter($pattern);
+  }
+
+  public function invalidPattern() {
+    return array(
+      // An empty pattern.
+      array(''),
+      array('foo:bar'),
+      // Empty negative pattern.
+      array('foo.00;'),
+      // Empty positive pattern.
+      array(';bar.00'),
+    );
   }
 
   /**
    * Test amount formatting.
    *
-   * @depends testPatternValidation
+   * @dataProvider formatPattern
+   *
+   * @depends testValidPatternValidation
+   * @depends testInvalidPatternValidation
    */
-  function testFormat() {
-    $numbers = array(123456789, -12345678.9, 1234567.89, -123456.789);
-    $patterns = array(
+  function testFormat($numbers, $formatter, $results_expected, $formatter_parameters = NULL) {
+    foreach ($numbers as $i => $number) {
+      $result_expected = $results_expected[$i];
+      $result = $formatter->format($number, $formatter_parameters);
+      $this->assertSame($result_expected, $result, 'BartFeenstra\CLDR\DecimalFormatter::format() formats amount ' . $number . ' as ' . $result_expected . ' using pattern ' . $formatter->pattern . ' (result was ' . $result . ').');
+    }
+  }
+
+  public function formatPattern() {
+    return array(
       // Test inconsistent group sizes and a custom negative pattern.
       array(
-        'formatter' => new DecimalFormatter('#,##0.00;#,##0.00-', array(
+        array(123456789, -12345678.9, 1234567.89, -123456.789),
+        new DecimalFormatter('#,##0.00;#,##0.00-', array(
           DecimalFormatter::SYMBOL_SPECIAL_DECIMAL_SEPARATOR => ',',
           DecimalFormatter::SYMBOL_SPECIAL_GROUPING_SEPARATOR => '.',
         )),
-        'results' => array(
+        array(
           '123.456.789,00',
           '12.345.678,90-',
           '1.234.567,89',
@@ -97,6 +101,7 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase {
       // Test without grouping separators, a default negative pattern, no
       // decimals, and a pattern that is shorter than the numbers.
       array(
+        array(123456789, -12345678.9, 1234567.89, -123456.789),
         'formatter' => new DecimalFormatter('#0.', array(
           DecimalFormatter::SYMBOL_SPECIAL_DECIMAL_SEPARATOR => ',',
           DecimalFormatter::SYMBOL_SPECIAL_GROUPING_SEPARATOR => '',
@@ -111,6 +116,7 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase {
       // Test identical decimal and grouping separators, identical positive
       // and negative patterns, and redundant hashes and grouping separators.
       array(
+        array(123456789, -12345678.9, 1234567.89, -123456.789),
         'formatter' => new DecimalFormatter('###,###,###,##0.00;###,###,###,##0.00', array(
           DecimalFormatter::SYMBOL_SPECIAL_DECIMAL_SEPARATOR => '.',
           DecimalFormatter::SYMBOL_SPECIAL_GROUPING_SEPARATOR => '.',
@@ -125,6 +131,7 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase {
       // Test some unusual character combinations and positions, and an
       // empty decimal separator.
       array(
+        array(123456789, -12345678.9, 1234567.89, -123456.789),
         'formatter' => new DecimalFormatter("####000/@##0.<span style=\"text-transform: uppercase';'\">00</span>--;-####000/@##0.<span style=\"text-transform: uppercase';'\">00</span>--", array(
           DecimalFormatter::SYMBOL_SPECIAL_DECIMAL_SEPARATOR => '',
           DecimalFormatter::SYMBOL_SPECIAL_GROUPING_SEPARATOR => '.',
@@ -138,6 +145,7 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase {
       ),
       // Test character escaping.
       array(
+        array(123456789, -12345678.9, 1234567.89, -123456.789),
         'formatter' => new DecimalFormatter("##'#'.00", array(
           DecimalFormatter::SYMBOL_SPECIAL_DECIMAL_SEPARATOR => ',',
           DecimalFormatter::SYMBOL_SPECIAL_GROUPING_SEPARATOR => '.',
@@ -149,14 +157,39 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase {
           '-123456#,789',
         ),
       ),
+      // Test parameters.
+      array(
+        array(3333.3333, 3),
+        'formatter' => new DecimalFormatter("#,##0.00", array(
+          DecimalFormatter::SYMBOL_SPECIAL_DECIMAL_SEPARATOR => ',',
+          DecimalFormatter::SYMBOL_SPECIAL_GROUPING_SEPARATOR => '.',
+        )),
+        'results' => array(
+          '333,33', '03,0'
+        ),
+        new DecimalFormatterParameters(array(
+          'minimumFractionDigits' => 1,
+          'maximumFractionDigits' => 2,
+          'maximumIntegerDigits' => 3,
+          'minimumIntegerDigits' => 2
+        )),
+      ),
+      array(
+        array(222, 2),
+        'formatter' => new DecimalFormatter("#,##0.00", array(
+          DecimalFormatter::SYMBOL_SPECIAL_DECIMAL_SEPARATOR => ',',
+          DecimalFormatter::SYMBOL_SPECIAL_GROUPING_SEPARATOR => '.',
+        )),
+        'results' => array(
+          '222', '02'
+        ),
+        new DecimalFormatterParameters(array(
+          'minimumFractionDigits' => 0,
+          'maximumFractionDigits' => 2,
+          'maximumIntegerDigits' => 3,
+          'minimumIntegerDigits' => 2
+        )),
+      ),
     );
-    foreach ($patterns as $pattern_info) {
-      foreach ($numbers as $i => $number) {
-        $formatter = $pattern_info['formatter'];
-        $result_expected = $pattern_info['results'][$i];
-        $result = $formatter->format($number);
-        $this->assertSame($result, $result_expected, 'BartFeenstra\CLDR\DecimalFormatter::format() formats amount ' . $number . ' as ' . $result_expected . ' using pattern ' . $formatter->pattern . ' (result was ' . $result . ').');
-      }
-    }
   }
 }
