@@ -25,7 +25,7 @@ class NumberPatternSymbol
      *
      * @var boolean
      */
-    public $escapes_other_symbol = FALSE;
+    public $escapesOtherSymbol = FALSE;
 
     /**
      * The symbol's position in the original pattern.

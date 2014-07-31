@@ -25,11 +25,11 @@ class IntegerFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = new TestIntegerFormatter('#,##0.00;#,##0.00-', array(
             IntegerFormatter::SYMBOL_SPECIAL_GROUPING_SEPARATOR => '.',
         ));
-        $formatter_clone = clone $formatter;
+        $formatterClone = clone $formatter;
         $symbols = $formatter->get('symbols');
         $symbols[IntegerFormatter::POSITIVE][0]->symbol = 'AAA';
-        $symbols_clone = $formatter_clone->get('symbols');
-        $this->assertNotSame($symbols[IntegerFormatter::POSITIVE][0]->symbol, $symbols_clone[IntegerFormatter::POSITIVE][0]->symbol, 'When an IntegerFormatter is cloned, so are its NumberPatternSymbol elements.');
+        $clonedSymbols = $formatterClone->get('symbols');
+        $this->assertNotSame($symbols[IntegerFormatter::POSITIVE][0]->symbol, $clonedSymbols[IntegerFormatter::POSITIVE][0]->symbol, 'When an IntegerFormatter is cloned, so are its NumberPatternSymbol elements.');
     }
 
     /**
@@ -71,12 +71,12 @@ class IntegerFormatterTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
         );
-        foreach ($patterns as $pattern_info) {
+        foreach ($patterns as $patternInfo) {
             foreach ($numbers as $i => $number) {
-                $formatter = $pattern_info['formatter'];
-                $result_expected = $pattern_info['results'][$i];
+                $formatter = $patternInfo['formatter'];
+                $expectedResult = $patternInfo['results'][$i];
                 $result = $formatter->format($number);
-                $this->assertSame($result, $result_expected, 'BartFeenstra\CLDR\IntegerFormatter::format() formats amount ' . $number . ' as ' . $result_expected . ' using pattern ' . $formatter->pattern . ' (result was ' . $result . ').');
+                $this->assertSame($result, $expectedResult, 'BartFeenstra\CLDR\IntegerFormatter::format() formats amount ' . $number . ' as ' . $expectedResult . ' using pattern ' . $formatter->pattern . ' (result was ' . $result . ').');
             }
         }
     }

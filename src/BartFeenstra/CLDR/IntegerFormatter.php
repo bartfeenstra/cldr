@@ -121,7 +121,7 @@ class IntegerFormatter
      *   Keys are any of the self::SYMBOL_SPECIAL_* constants, values are those
      *   constants' replacements.
      */
-    public $symbol_replacements = array();
+    public $symbolReplacements = array();
 
     /**
      * Implements __construct().
@@ -131,22 +131,22 @@ class IntegerFormatter
      * @param string $pattern
      *   A Unicode CLDR number pattern, without short number support.
      *   See http://cldr.unicode.org/translation/number-patterns.
-     * @param array $symbol_replacements
+     * @param array $symbolReplacements
      *   Keys are one of the self::SYMBOL_SPECIAL_* constants, values are their
      *   replacements.
      */
-    function __construct($pattern, array $symbol_replacements = array())
+    function __construct($pattern, array $symbolReplacements = array())
     {
         $this->pattern = $pattern;
-        $this->symbol_replacements = $symbol_replacements;
+        $this->symbolReplacements = $symbolReplacements;
         $this->symbols = $this->patternSymbolsSplit($this->patternSymbols($pattern), self::SYMBOL_PATTERN_SEPARATOR, TRUE);
         // If there is no negative pattern, add a default.
         if ($this->symbols[self::NEGATIVE] === FALSE) {
             $pattern .= ';-' . $pattern;
             $this->symbols = $this->patternSymbolsSplit($this->patternSymbols($pattern), self::SYMBOL_PATTERN_SEPARATOR, TRUE);
         }
-        foreach ($this->symbols as $sign_symbols) {
-            if (empty($sign_symbols)) {
+        foreach ($this->symbols as $signSymbols) {
+            if (empty($signSymbols)) {
                 throw new \InvalidArgumentException('Empty number pattern.');
             }
         }
@@ -173,7 +173,7 @@ class IntegerFormatter
     {
         // Convert the pattern to NumberPatternSymbol objects.
         $symbols = array();
-        foreach ($this->str_split($pattern) as $position => $symbol) {
+        foreach ($this->splitString($pattern) as $position => $symbol) {
             $symbols[] = new NumberPatternSymbol($symbol, $position);
         }
 
@@ -181,20 +181,20 @@ class IntegerFormatter
         foreach ($symbols as $i => $symbol) {
             // Check if the previous character is an unused escape symbol for this
             // symbol.
-            if (isset($symbols[$i - 1]) && $symbols[$i - 1]->symbol == self::SYMBOL_ESCAPE && !$symbols[$i - 1]->escaped && !$symbols[$i - 1]->escapes_other_symbol
+            if (isset($symbols[$i - 1]) && $symbols[$i - 1]->symbol == self::SYMBOL_ESCAPE && !$symbols[$i - 1]->escaped && !$symbols[$i - 1]->escapesOtherSymbol
                 // Check if the next character is an escape symbol for this symbol.
-                && isset($symbols[$i + 1]) && $symbols[$i + 1]->symbol == self::SYMBOL_ESCAPE && !$symbols[$i + 1]->escaped && !$symbols[$i + 1]->escapes_other_symbol
+                && isset($symbols[$i + 1]) && $symbols[$i + 1]->symbol == self::SYMBOL_ESCAPE && !$symbols[$i + 1]->escaped && !$symbols[$i + 1]->escapesOtherSymbol
             ) {
                 $symbol->escaped = TRUE;
-                $symbols[$i - 1]->escapes_other_symbol = TRUE;
-                $symbols[$i + 1]->escapes_other_symbol = TRUE;
+                $symbols[$i - 1]->escapesOtherSymbol = TRUE;
+                $symbols[$i + 1]->escapesOtherSymbol = TRUE;
             }
         }
 
         // Find illegal escape symbols, such as escape symbols that do not escape
         // other symbols and are not escaped themselves.
         foreach ($symbols as $symbol) {
-            if ($symbol->symbol == self::SYMBOL_ESCAPE && !$symbol->escaped && !$symbol->escapes_other_symbol) {
+            if ($symbol->symbol == self::SYMBOL_ESCAPE && !$symbol->escaped && !$symbol->escapesOtherSymbol) {
                 throw new \RunTimeException("Invalid escape symbol (') in pattern " . $pattern . "at position $symbol->position.");
             }
         }
@@ -202,7 +202,7 @@ class IntegerFormatter
         // Remove escape symbols from the array, because we have transferred their
         // meaning to other symbols' NumberPatternSymbol objects.
         foreach ($symbols as $i => $symbol) {
-            if ($symbol->escapes_other_symbol) {
+            if ($symbol->escapesOtherSymbol) {
                 unset($symbols[$i]);
             }
         }
@@ -220,38 +220,38 @@ class IntegerFormatter
      * @param array $symbols
      *   An array of NumberPatternSymbol objects.
      * @param string $separator
-     * @param boolean $optional_right_fragment
+     * @param boolean $optionalRightFragment
      *   Whether the symbols on the right side of the separator, and, because of
      *   that, the separator itself are optional.
      *
      * @return array
      *   An array of NumberPatternSymbol objects.
      */
-    protected function patternSymbolsSplit(array $symbols, $separator, $optional_right_fragment = FALSE)
+    protected function patternSymbolsSplit(array $symbols, $separator, $optionalRightFragment = FALSE)
     {
-        $separator_position = NULL;
+        $separatorPosition = NULL;
         foreach ($symbols as $position => $symbol) {
             if (!($symbol instanceof NumberPatternSymbol)) {
                 throw new \InvalidArgumentException();
             }
             if ($symbol->symbol === $separator && !$symbol->escaped) {
-                if (is_null($separator_position)) {
-                    $separator_position = $position;
+                if (is_null($separatorPosition)) {
+                    $separatorPosition = $position;
                 } else {
                     throw new \RunTimeException("Illegal separator ($separator) at position $symbol->position.");
                 }
             }
         }
 
-        if (!$separator_position) {
-            if ($optional_right_fragment) {
+        if (!$separatorPosition) {
+            if ($optionalRightFragment) {
                 return array($symbols, FALSE);
             }
             throw new \RunTimeException("Missing separator ($separator).");
         } else {
             return array(
-                array_slice($symbols, 0, $separator_position),
-                array_slice($symbols, $separator_position + 1),
+                array_slice($symbols, 0, $separatorPosition),
+                array_slice($symbols, $separatorPosition + 1),
             );
         }
     }
@@ -263,17 +263,17 @@ class IntegerFormatter
      *
      * @param string $string
      *   The input string.
-     * @param integer $split_length
+     * @param integer $splitLength
      *   Maximum length of the chunk.
      *
      * @return array|false
      */
-    static function str_split($string, $split_length = 1)
+    static function splitString($string, $splitLength = 1)
     {
-        if ($split_length < 1) {
+        if ($splitLength < 1) {
             return FALSE;
         }
-        preg_match_all('/.{1,' . $split_length . '}/u', $string, $matches);
+        preg_match_all('/.{1,' . $splitLength . '}/u', $string, $matches);
         return $matches[0];
     }
 
@@ -288,7 +288,7 @@ class IntegerFormatter
      */
     static function strrev($string)
     {
-        return implode(array_reverse(self::str_split($string)));
+        return implode(array_reverse(self::splitString($string)));
     }
 
     /**
@@ -301,7 +301,7 @@ class IntegerFormatter
      */
     function getReplacement($symbol)
     {
-        return isset($this->symbol_replacements[$symbol]) ? $this->symbol_replacements[$symbol] : $symbol;
+        return isset($this->symbolReplacements[$symbol]) ? $this->symbolReplacements[$symbol] : $symbol;
     }
 
     /**
@@ -395,36 +395,36 @@ class IntegerFormatter
         $symbols = array_reverse($symbols);
         $digits = array_reverse($digits);
 
-        $last_digit_placeholder_i = 0;
-        $last_optional_digit_placeholder_i = 0;
+        $lastDigitPlaceholderIndex = 0;
+        $lastOptionalDigitPlaceholderIndex = 0;
         foreach ($symbols as $i => $symbol) {
             if ($this->symbolIsSpecial($symbol, array(self::SYMBOL_DIGIT, self::SYMBOL_DIGIT_OPTIONAL))) {
-                $last_digit_placeholder_i = $i;
+                $lastDigitPlaceholderIndex = $i;
             }
             if ($this->symbolIsSpecial($symbol, array(self::SYMBOL_DIGIT_OPTIONAL))) {
-                $last_optional_digit_placeholder_i = $i;
+                $lastOptionalDigitPlaceholderIndex = $i;
             }
         }
-        $last_grouping_size = 0;
-        $current_grouping_size = 0;
-        $last_digit_i = 0;
+        $lastGroupingSize = 0;
+        $currentGroupingSize = 0;
+        $lastDigitIndex = 0;
         foreach ($symbols as $i => $symbol) {
             // Replace placeholders, but only if we still have digits left to replace
             // them with.
             if ($digits && $this->symbolIsSpecial($symbol, array(self::SYMBOL_DIGIT, self::SYMBOL_DIGIT_OPTIONAL))) {
                 // This is the last placeholder, so replace it with all remaining digits.
-                if ($i == $last_digit_placeholder_i) {
+                if ($i == $lastDigitPlaceholderIndex) {
                     // If the pattern uses groupings, group remaining digits before
                     // adding them.
-                    if ($last_grouping_size) {
+                    if ($lastGroupingSize) {
                         // Make sure the current grouping is full.
-                        while ($current_grouping_size < $last_grouping_size) {
+                        while ($currentGroupingSize < $lastGroupingSize) {
                             $symbol->replacement = array_shift($digits) . $symbol->replacement;
-                            $current_grouping_size++;
+                            $currentGroupingSize++;
                         }
                         // If there are still digits left, add them as new groupings.
                         if ($digits) {
-                            $chunks = $this->str_split(implode($digits), $last_grouping_size);
+                            $chunks = $this->splitString(implode($digits), $lastGroupingSize);
                             foreach (array_reverse($chunks) as $chunk) {
                                 array_splice($symbols, $i + 1, 0, array(new NumberPatternSymbol(strrev($chunk))));
                                 array_splice($symbols, $i + 1, 0, array(new NumberPatternSymbol(self::SYMBOL_SPECIAL_GROUPING_SEPARATOR)));
@@ -441,21 +441,21 @@ class IntegerFormatter
                 } // This is not the last placeholder, so replace it with a single digit.
                 else {
                     $symbol->replacement = array_shift($digits);
-                    $current_grouping_size++;
+                    $currentGroupingSize++;
                 }
-                $last_digit_i = $i;
+                $lastDigitIndex = $i;
             } // Keep track of the last grouping size.
             elseif ($this->symbolIsSpecial($symbol, array(self::SYMBOL_SPECIAL_GROUPING_SEPARATOR))) {
-                $last_grouping_size = $current_grouping_size;
-                $current_grouping_size = 0;
+                $lastGroupingSize = $currentGroupingSize;
+                $currentGroupingSize = 0;
             }
         }
 
         // Removes the last optional digit placeholder and everything between that
         // symbol and the last inserted digit.
-        while ($last_optional_digit_placeholder_i > $last_digit_i) {
-            unset($symbols[$last_optional_digit_placeholder_i]);
-            $last_optional_digit_placeholder_i--;
+        while ($lastOptionalDigitPlaceholderIndex > $lastDigitIndex) {
+            unset($symbols[$lastOptionalDigitPlaceholderIndex]);
+            $lastOptionalDigitPlaceholderIndex--;
         }
 
         // Put the symbols back in the order we received them in.
@@ -474,8 +474,8 @@ class IntegerFormatter
             self::POSITIVE => array(),
             self::NEGATIVE => array(),
         );
-        foreach ($this->symbols as $sign => $sign_symbols) {
-            foreach ($sign_symbols as $symbol) {
+        foreach ($this->symbols as $sign => $signSymbols) {
+            foreach ($signSymbols as $symbol) {
                 $clone[$sign][] = clone $symbol;
             }
         }

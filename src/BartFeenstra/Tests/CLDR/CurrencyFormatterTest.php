@@ -23,10 +23,10 @@ class CurrencyFormatterTest extends \PHPUnit_Framework_TestCase
     function testFormat()
     {
         $formatter = new CurrencyFormatter('¤0.00');
-        $currency_sign = '€';
+        $currencySign = '€';
         $number = 123456.789;
-        $result_expected = $currency_sign . '123456.789';
-        $result = $formatter->format($number, $currency_sign);
-        $this->assertSame($result, $result_expected, 'BartFeenstra\CLDR\CurrencyFormatter::format() formats amount ' . $number . ' as ' . $result_expected . ' using pattern ' . $formatter->pattern . ' (result was ' . $result . ').');
+        $expectedResult = $currencySign . '123456.789';
+        $result = $formatter->format($number, $currencySign);
+        $this->assertSame($result, $expectedResult, 'BartFeenstra\CLDR\CurrencyFormatter::format() formats amount ' . $number . ' as ' . $expectedResult . ' using pattern ' . $formatter->pattern . ' (result was ' . $result . ').');
     }
 }

@@ -25,11 +25,11 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = new TestDecimalFormatter('#,##0.00;#,##0.00-', array(
             DecimalFormatter::SYMBOL_SPECIAL_GROUPING_SEPARATOR => '.',
         ));
-        $formatter_clone = clone $formatter;
+        $formatterClone = clone $formatter;
         $symbols = $formatter->get('symbols');
         $symbols[DecimalFormatter::POSITIVE][DecimalFormatter::MAJOR][0]->symbol = 'AAA';
-        $symbols_clone = $formatter_clone->get('symbols');
-        $this->assertNotSame($symbols[DecimalFormatter::POSITIVE][DecimalFormatter::MAJOR][0]->symbol, $symbols_clone[DecimalFormatter::POSITIVE][DecimalFormatter::MAJOR][0]->symbol, 'When a DecimalFormatter is cloned, so are its NumberPatternSymbol elements.');
+        $clonedSymbols = $formatterClone->get('symbols');
+        $this->assertNotSame($symbols[DecimalFormatter::POSITIVE][DecimalFormatter::MAJOR][0]->symbol, $clonedSymbols[DecimalFormatter::POSITIVE][DecimalFormatter::MAJOR][0]->symbol, 'When a DecimalFormatter is cloned, so are its NumberPatternSymbol elements.');
     }
 
     /**
@@ -38,10 +38,10 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase
     function testPatternValidation()
     {
         // Test validating valid number patterns.
-        $patterns_valid = array(
+        $validPatterns = array(
             'foo.00;bar.00',
         );
-        foreach ($patterns_valid as $pattern) {
+        foreach ($validPatterns as $pattern) {
             try {
                 new DecimalFormatter($pattern);
                 $valid = TRUE;
@@ -52,7 +52,7 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase
         }
 
         // Test validating invalid number patterns.
-        $patterns_invalid = array(
+        $invalidPatterns = array(
             // An empty pattern.
             '',
             // No decimal separator.
@@ -63,7 +63,7 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase
             // Empty positive pattern.
             ';bar.00',
         );
-        foreach ($patterns_invalid as $pattern) {
+        foreach ($invalidPatterns as $pattern) {
             try {
                 new DecimalFormatter($pattern);
                 $valid = TRUE;
@@ -152,12 +152,12 @@ class DecimalFormatterTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
         );
-        foreach ($patterns as $pattern_info) {
+        foreach ($patterns as $patternInfo) {
             foreach ($numbers as $i => $number) {
-                $formatter = $pattern_info['formatter'];
-                $result_expected = $pattern_info['results'][$i];
+                $formatter = $patternInfo['formatter'];
+                $expectedResult = $patternInfo['results'][$i];
                 $result = $formatter->format($number);
-                $this->assertSame($result, $result_expected, 'BartFeenstra\CLDR\DecimalFormatter::format() formats amount ' . $number . ' as ' . $result_expected . ' using pattern ' . $formatter->pattern . ' (result was ' . $result . ').');
+                $this->assertSame($result, $expectedResult, 'BartFeenstra\CLDR\DecimalFormatter::format() formats amount ' . $number . ' as ' . $expectedResult . ' using pattern ' . $formatter->pattern . ' (result was ' . $result . ').');
             }
         }
     }

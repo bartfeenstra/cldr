@@ -37,18 +37,18 @@ class DecimalFormatter extends IntegerFormatter
     /**
      * Overrides parent::__construct().
      */
-    function __construct($pattern, array $symbol_replacements = array())
+    function __construct($pattern, array $symbolReplacements = array())
     {
         $this->pattern = $pattern;
-        $this->symbol_replacements = $symbol_replacements;
+        $this->symbolReplacements = $symbolReplacements;
         $symbols = $this->patternSymbolsSplit($this->patternSymbols($pattern), self::SYMBOL_PATTERN_SEPARATOR, TRUE);
         // If there is no negative pattern, add a default.
         if ($symbols[self::NEGATIVE] === FALSE) {
             $pattern .= ';-' . $pattern;
             $symbols = $this->patternSymbolsSplit($this->patternSymbols($pattern), self::SYMBOL_PATTERN_SEPARATOR, TRUE);
         }
-        foreach ($symbols as $sign_symbols) {
-            if (empty($sign_symbols)) {
+        foreach ($symbols as $signSymbols) {
+            if (empty($signSymbols)) {
                 throw new \InvalidArgumentException('Empty number pattern.');
             }
         }
@@ -94,8 +94,8 @@ class DecimalFormatter extends IntegerFormatter
         $this->process($symbols[$sign][self::MAJOR], $digits[self::MAJOR]);
         // Integer formatting defaults from right to left, but minor units should
         // be formatted from left to right, so reverse all data and results.
-        $symbols_minor = array_reverse($symbols[$sign][self::MINOR]);
-        $this->process($symbols_minor, array_reverse($digits[self::MINOR]));
+        $minorSymbols = array_reverse($symbols[$sign][self::MINOR]);
+        $this->process($minorSymbols, array_reverse($digits[self::MINOR]));
         foreach ($symbols[$sign][self::MINOR] as $symbol) {
             if (!is_null($symbol->replacement)) {
                 $symbol->replacement = strrev($symbol->replacement);
@@ -107,9 +107,9 @@ class DecimalFormatter extends IntegerFormatter
             self::MAJOR => '',
             self::MINOR => '',
         );
-        foreach ($symbols[$sign] as $fragment => $fragment_symbols) {
-            $this->replacePlaceholders($fragment_symbols);
-            foreach ($fragment_symbols as $symbol) {
+        foreach ($symbols[$sign] as $fragment => $fragmentSymbols) {
+            $this->replacePlaceholders($fragmentSymbols);
+            foreach ($fragmentSymbols as $symbol) {
                 $output[$fragment] .= !is_null($symbol->replacement) ? $symbol->replacement : $symbol->symbol;
             }
         }
@@ -135,9 +135,9 @@ class DecimalFormatter extends IntegerFormatter
                 self::MINOR => array(),
             ),
         );
-        foreach ($this->symbols as $sign => $sign_symbols) {
-            foreach ($sign_symbols as $fragment => $fragment_symbols) {
-                foreach ($fragment_symbols as $symbol) {
+        foreach ($this->symbols as $sign => $signSymbols) {
+            foreach ($signSymbols as $fragment => $fragmentSymbols) {
+                foreach ($fragmentSymbols as $symbol) {
                     $clone[$sign][$fragment][] = clone $symbol;
                 }
             }

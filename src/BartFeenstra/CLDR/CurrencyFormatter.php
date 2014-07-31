@@ -32,15 +32,15 @@ class CurrencyFormatter extends DecimalFormatter
      * Overrides parent::format().
      *
      * @param float|string $number
-     * @param string $currency_sign
+     * @param string $currencySign
      *   An ISO 4217 code or currency sign.
      *
      * @return string
      *   The formatted number.
      */
-    public function format($number, $currency_sign = NULL)
+    public function format($number, $currencySign = NULL)
     {
-        $this->symbol_replacements[self::SYMBOL_SPECIAL_CURRENCY] = $currency_sign;
+        $this->symbolReplacements[self::SYMBOL_SPECIAL_CURRENCY] = $currencySign;
 
         return parent::format($number);
     }
