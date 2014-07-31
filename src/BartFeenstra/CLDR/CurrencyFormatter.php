@@ -34,6 +34,9 @@ class CurrencyFormatter extends DecimalFormatter
      * @param float|string $number
      * @param string $currency_sign
      *   An ISO 4217 code or currency sign.
+     *
+     * @return string
+     *   The formatted number.
      */
     public function format($number, $currency_sign = NULL)
     {

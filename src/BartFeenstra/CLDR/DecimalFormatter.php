@@ -64,7 +64,12 @@ class DecimalFormatter extends IntegerFormatter
      * A decimal is formatted by splitting it into two integers: the major
      * and minor unit. They are formatted individually and then joined together.
      *
+     * @throws \InvalidArgumentException
+     *
      * @param float|string $number
+     *
+     * @return string
+     *   The formatted number.
      */
     public function format($number)
     {

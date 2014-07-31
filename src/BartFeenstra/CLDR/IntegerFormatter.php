@@ -126,6 +126,8 @@ class IntegerFormatter
     /**
      * Implements __construct().
      *
+     * @throws \InvalidArgumentException
+     *
      * @param string $pattern
      *   A Unicode CLDR number pattern, without short number support.
      *   See http://cldr.unicode.org/translation/number-patterns.
@@ -259,7 +261,10 @@ class IntegerFormatter
      *
      * @see str_split()
      *
-     * @param string
+     * @param string $string
+     *   The input string.
+     * @param integer $split_length
+     *   Maximum length of the chunk.
      *
      * @return array|false
      */
@@ -346,6 +351,8 @@ class IntegerFormatter
 
     /**
      * Formats a number.
+     *
+     * @throws \InvalidArgumentException
      *
      * @param integer|string $number
      *
