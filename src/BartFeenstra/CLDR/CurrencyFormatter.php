@@ -23,7 +23,7 @@ class CurrencyFormatter extends DecimalFormatter
     /**
      * Overrides parent::replacePlaceholders()
      */
-    function replacePlaceholders(array $symbols, array $replacements = array())
+    protected function replacePlaceholders(array $symbols, array $replacements = array())
     {
         parent::replacePlaceholders($symbols, array(self::SYMBOL_SPECIAL_CURRENCY));
     }

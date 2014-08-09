@@ -37,7 +37,7 @@ class DecimalFormatter extends IntegerFormatter
     /**
      * Overrides parent::__construct().
      */
-    function __construct($pattern, array $symbolReplacements = array())
+    public function __construct($pattern, array $symbolReplacements = array())
     {
         $this->pattern = $pattern;
         $this->symbolReplacements = $symbolReplacements;
@@ -123,7 +123,7 @@ class DecimalFormatter extends IntegerFormatter
      * @return array
      *  An array identical to $this->symbols.
      */
-    function cloneNumberPatternSymbols()
+    protected function cloneNumberPatternSymbols()
     {
         $clone = array(
             self::POSITIVE => array(

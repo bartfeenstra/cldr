@@ -51,7 +51,7 @@ class NumberPatternSymbol
     /**
      * Implements __construct().
      */
-    function __construct($symbol, $position = NULL, $escaped = FALSE)
+    public function __construct($symbol, $position = NULL, $escaped = FALSE)
     {
         $this->symbol = $symbol;
         $this->position = $position;

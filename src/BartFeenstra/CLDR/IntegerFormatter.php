@@ -135,7 +135,7 @@ class IntegerFormatter
      *   Keys are one of the self::SYMBOL_SPECIAL_* constants, values are their
      *   replacements.
      */
-    function __construct($pattern, array $symbolReplacements = array())
+    public function __construct($pattern, array $symbolReplacements = array())
     {
         $this->pattern = $pattern;
         $this->symbolReplacements = $symbolReplacements;
@@ -155,7 +155,7 @@ class IntegerFormatter
     /**
      * Implements __clone().
      */
-    function __clone()
+    public function __clone()
     {
         $this->symbols = $this->cloneNumberPatternSymbols($this->symbols);
     }
@@ -169,7 +169,7 @@ class IntegerFormatter
      *
      * @return array
      */
-    function patternSymbols($pattern)
+    protected function patternSymbols($pattern)
     {
         // Convert the pattern to NumberPatternSymbol objects.
         $symbols = array();
@@ -299,7 +299,7 @@ class IntegerFormatter
      *
      * @return string
      */
-    function getReplacement($symbol)
+    protected function getReplacement($symbol)
     {
         return isset($this->symbolReplacements[$symbol]) ? $this->symbolReplacements[$symbol] : $symbol;
     }
@@ -314,7 +314,7 @@ class IntegerFormatter
      *
      * @return boolean
      */
-    function symbolIsSpecial(NumberPatternSymbol $symbol, array $is)
+    protected function symbolIsSpecial(NumberPatternSymbol $symbol, array $is)
     {
         return !$symbol->escaped && in_array($symbol->symbol, $is, TRUE);
     }
@@ -327,7 +327,7 @@ class IntegerFormatter
      * @param array $placeholders
      *   Characters that should be matched by a NumberPatternSymbol object.
      */
-    function replacePlaceholders(array $symbols, array $placeholders = array())
+    protected function replacePlaceholders(array $symbols, array $placeholders = array())
     {
         $placeholders = array_merge(array(
             self::SYMBOL_SPECIAL_GROUPING_SEPARATOR,
@@ -468,7 +468,7 @@ class IntegerFormatter
      * @return array
      *  An array identical to $this->symbols.
      */
-    function cloneNumberPatternSymbols()
+    protected function cloneNumberPatternSymbols()
     {
         $clone = array(
             self::POSITIVE => array(),
