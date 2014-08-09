@@ -12,16 +12,18 @@ use BartFeenstra\CLDR\DecimalFormatter;
 /**
  * A testing version of IntegerFormatter.
  */
-class TestDecimalFormatter extends DecimalFormatter {
+class TestDecimalFormatter extends DecimalFormatter
+{
 
-  /**
-   * Gets a class property.
-   *
-   * @param string $name
-   *
-   * @return mixed
-   */
-  function get($name) {
-    return $this->$name;
-  }
+    /**
+     * Gets a class property.
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
+    function get($name)
+    {
+        return $this->$name;
+    }
 }
